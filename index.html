@@ -91,7 +91,7 @@
         <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 my-2 sm:my-4">
             
             <!-- Header Banner -->
-            <div class="bg-church-gradient p-5 sm:p-7 md:p-8 text-white text-center relative overflow-hidden border-b-2 border-amber-400/40">
+            <div class="bg-church-gradient px-6 py-6 sm:px-8 sm:py-8 text-white text-center relative overflow-hidden border-b-2 border-amber-400/40">
                 <!-- Decorative Cross Pattern Overlay -->
                 <div class="absolute inset-0 opacity-10 flex justify-between items-center px-4 sm:px-6 pointer-events-none">
                     <i class="fa-solid fa-cross text-5xl sm:text-7xl"></i>
@@ -99,8 +99,13 @@
                     <i class="fa-solid fa-cross text-5xl sm:text-7xl"></i>
                 </div>
 
-                <div class="relative z-10">
-                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-full border border-white/20 text-[11px] sm:text-xs font-medium uppercase tracking-widest text-amber-300 mb-2.5 sm:mb-3 shadow-inner">
+                <div class="relative z-10 flex flex-col items-center">
+                    <!-- Logo GMIM Lokal (images.jpg) dengan bingkai rapi -->
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full p-1.5 shadow-xl border-2 border-amber-400/80 mb-4 flex items-center justify-center overflow-hidden shrink-0">
+                        <img src="images.jpg" alt="Logo GMIM" class="w-full h-full object-cover rounded-full">
+                    </div>
+
+                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 sm:px-4 py-1 rounded-full border border-white/20 text-[11px] sm:text-xs font-medium uppercase tracking-widest text-amber-300 mb-2.5 shadow-inner">
                         <i class="fa-solid fa-dove text-amber-300"></i>
                         <span>Aplikasi Pemilihan Pelsus</span>
                     </div>
@@ -162,7 +167,7 @@
                     </div>
 
                     <div class="relative flex items-center">
-                        <input type="number" id="jumlahSidi" readonly min="1"
+                        <input type="number" id="jumlahSidi" readonly min="0"
                             class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-slate-800 font-bold text-sm sm:text-base md:text-lg cursor-not-allowed transition-all focus:outline-none" 
                             placeholder="Pilih kolom terlebih dahulu...">
                         <span class="absolute right-4 text-slate-400 text-xs sm:text-sm font-medium">orang</span>
@@ -242,7 +247,7 @@
                             <span>Reset Keseluruhan</span>
                         </button>
                         <p class="text-[11px] text-slate-400 mt-1.5 text-center italic">
-                            *Reset keseluruhan menghapus seluruh kustomisasi jumlah sidi jemaat dan mengembalikannya ke pengaturan awal.
+                            *Reset keseluruhan menghapus seluruh kustomisasi jumlah sidi jemaat dan mengembalikannya ke angka nol.
                         </p>
                     </div>
                 </div>
@@ -257,16 +262,16 @@
     </main>
 
     <script>
-        // Data Awal Jumlah Sidi Jemaat Kolom 1-19
+        // Data Awal Jumlah Sidi Jemaat Kolom 1-19 diatur menjadi 0 secara default
         const initialSidiJemaat = {
-            1: 50, 2: 45, 3: 30, 4: 25, 5: 40,
-            6: 45, 7: 35, 8: 30, 9: 20, 10: 25,
-            11: 38, 12: 40, 13: 45, 14: 48, 15: 30,
-            16: 50, 17: 35, 18: 30, 19: 30
+            1: 0, 2: 0, 3: 0, 4: 0, 5: 0,
+            6: 0, 7: 0, 8: 0, 9: 0, 10: 0,
+            11: 0, 12: 0, 13: 0, 14: 0, 15: 0,
+            16: 0, 17: 0, 18: 0, 19: 0
         };
 
         let dataSidiJemaat = { ...initialSidiJemaat };
-        const savedSidi = localStorage.getItem('gmim_sidi_data');
+        const savedSidi = localStorage.getItem('gmim_sidi_data_v3');
         if (savedSidi) {
             try { Object.assign(dataSidiJemaat, JSON.parse(savedSidi)); } catch(e){}
         }
@@ -298,7 +303,7 @@
                 toggleEditSidi(false); 
             }
 
-            if (selected && dataSidiJemaat[selected]) {
+            if (selected && dataSidiJemaat[selected] !== undefined) {
                 btnEditSidi.disabled = false;
                 const totalSidi = dataSidiJemaat[selected];
                 inputSidi.value = totalSidi;
@@ -329,9 +334,9 @@
             } else {
                 if (saveChanges) {
                     const newVal = parseInt(inputSidi.value, 10);
-                    if (!isNaN(newVal) && newVal > 0) {
+                    if (!isNaN(newVal) && newVal >= 0) {
                         dataSidiJemaat[selected] = newVal;
-                        localStorage.setItem('gmim_sidi_data', JSON.stringify(dataSidiJemaat));
+                        localStorage.setItem('gmim_sidi_data_v3', JSON.stringify(dataSidiJemaat));
                         showNotification(`Jumlah Sidi Kolom ${selected} berhasil disimpan dan diperbarui menjadi ${newVal} orang.`);
                     } else {
                         inputSidi.value = dataSidiJemaat[selected];
@@ -404,11 +409,11 @@
         }
 
         function resetKeseluruhan() {
-            if (confirm("Apakah Anda yakin ingin mereset keseluruhan? Tindakan ini akan menghapus semua kustomisasi jumlah sidi jemaat dan mengembalikannya ke data awal.")) {
-                localStorage.removeItem('gmim_sidi_data');
+            if (confirm("Apakah Anda yakin ingin mereset keseluruhan? Tindakan ini akan menghapus semua kustomisasi jumlah sidi jemaat dan mengembalikannya ke angka nol.")) {
+                localStorage.removeItem('gmim_sidi_data_v3');
                 dataSidiJemaat = { ...initialSidiJemaat };
                 resetForm();
-                showNotification("Seluruh data sidi jemaat berhasil dikembalikan ke pengaturan awal.", true);
+                showNotification("Seluruh data sidi jemaat berhasil dikembalikan ke nilai nol.", true);
             }
         }
 
